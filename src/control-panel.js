@@ -9,7 +9,7 @@ function Checkbox({name, value, onChange}) {
   return (
     <div className="input">
       <label>{formatSettingName(name)}</label>
-      <input type="checkbox" checked={value} onChange={evt => onChange(name, evt.target.checked)} />
+      <input type="checkbox" checked={value} onChange={evt => onChange(evt.target.checked)} />
     </div>
   );
 }
@@ -28,7 +28,7 @@ function NumericInput({name, value, onChange}) {
 }
 
 function ControlPanel(props) {
-  const {settings, onChange} = props;
+  const {settings, onChange, toggleVal, onToggle} = props;
 
   const renderSetting = (name, value) => {
     switch (typeof value) {
@@ -43,10 +43,8 @@ function ControlPanel(props) {
 
   return (
     <div className="control-panel">
-      <p>Turn interactive features off/on.</p>
-
       <hr />
-
+      <Checkbox name="layer" value={toggleVal} onChange={onToggle}/>
       {Object.keys(settings).map(name => renderSetting(name, settings[name]))}
 
       <hr />

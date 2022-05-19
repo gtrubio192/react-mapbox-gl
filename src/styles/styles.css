@@ -31,9 +31,9 @@ body {
 }
 
 .weather-icon {
-  margin-left: 25%;
-  background: rebeccapurple;
-  opacity: .8;
+  margin-left: calc(10px + 25%);
+  background: blue;
+  opacity: .6;
   border-radius: 50%;
 }
 
@@ -49,6 +49,10 @@ body {
 
 .bold {
   font-weight: bold;
+}
+
+.text-center {
+  text-align: center;
 }
 
 label {

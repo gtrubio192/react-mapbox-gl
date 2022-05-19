@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {render} from 'react-dom';
 import axios from 'axios'
 import Map, {
@@ -7,7 +7,9 @@ import Map, {
   FullscreenControl,
   ScaleControl,
   GeolocateControl,
-  Popup
+  Popup,
+  Layer,
+  Source
 } from 'react-map-gl';
 import ControlPanel from './control-panel';
 
@@ -17,9 +19,9 @@ import './styles/styles.css'
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiZ3RydWJpbzE5MiIsImEiOiJjbDNjMzk3dHEwNWhyM2NzOHljMHR1cGswIn0.KQJ9ZsJTHI567vHyrmOStg';
 
 const initialViewState = {
-  latitude: 37.729,
-  longitude: -122.36,
-  zoom: 11
+  latitude: 38.8409,
+  longitude: -105.0423,
+  zoom: 10
 };
 
 const camelPattern = /(^|[A-Z])[a-z]*/g;
@@ -28,6 +30,8 @@ function formatSettingName(name) {
 }
 
 export default function App() {
+
+  const mapRef = useRef();
 
   const [viewState, setViewState] = useState({
     latitude: initialViewState.latitude,
@@ -40,14 +44,41 @@ export default function App() {
   //   latitude: initialViewState.latitude,
   //   longitude: initialViewState.longitude
   //  }
-  const [weatherData, setWeatherData] = useState()
-  const [showPopup, setShowPopup] = useState(false)
+  const [weatherData, setWeatherData] = useState();
+  const [layerToggle, setLayerToggle] = useState(false);
 
   useEffect(() => {
     if (markerCoordinates) {
       getWeather();
     }
   }, [markerCoordinates])
+
+  useEffect(() => {
+    if (layerToggle) {
+      mapRef.addSource('mapbox-terrain', {
+        type: 'vector',
+        // Use any Mapbox-hosted tileset using its tileset id.
+        // Learn more about where to find a tileset id:
+        // https://docs.mapbox.com/help/glossary/tileset-id/
+        url: 'mapbox://mapbox.mapbox-terrain-v2'
+      });
+
+      mapRef.addLayer({
+        'id': 'terrain-data',
+        'type': 'line',
+        'source': 'mapbox-terrain',
+        'source-layer': 'contour',
+        'layout': {
+        'line-join': 'round',
+        'line-cap': 'round'
+        },
+        'paint': {
+        'line-color': '#ff69b4',
+        'line-width': 1
+        }
+      });
+    }
+  }, [layerToggle])
 
   const updateSettings = useCallback(
     (name, value) =>
@@ -57,6 +88,10 @@ export default function App() {
       })),
     []
   );
+
+  const updateToggle = useCallback((val) => {
+    setLayerToggle(val)
+  })
 
   const getWeather = async () => {
     const WEATHER_API_KEY = '8eb6eece1d732e462a3657e77a8623ef';
@@ -95,13 +130,35 @@ export default function App() {
     );
   }
 
+  const contourLayer = {
+    'id': 'terrain-data',
+    'type': 'line',
+    'source': 'mapbox-terrain',
+    'source-layer': 'contour',
+    'layout': {
+      'line-join': 'round',
+      'line-cap': 'round'
+    },
+    'paint': {
+      'line-color': '#ff69b4',
+      'line-width': 1
+    }
+  };
+
+  const countourData = {
+    type: 'vector',
+    url: 'mapbox://mapbox.mapbox-terrain-v2'
+  }
+
   return (
     <>
       <section className="map">
         <Map
           {...viewState}
+          ref={mapRef}
           onMove={evt => setViewState(evt.viewState)}
-          mapStyle="mapbox://styles/gtrubio192/cl3d91f4k000615n3yvaary94" // "mapbox://styles/mapbox/streets-v9"
+          // mapStyle="mapbox://styles/gtrubio192/cl3d91f4k000615n3yvaary94"
+          mapStyle="mapbox://styles/mapbox/streets-v9"
           mapboxAccessToken={MAPBOX_TOKEN}
           onClick={(evt) => {
             setMarkerCoordinates({ latitude: evt.lngLat.lat, longitude: evt.lngLat.lng })
@@ -111,6 +168,11 @@ export default function App() {
           <FullscreenControl position="top-left" />
           <NavigationControl position="top-left" />
           <ScaleControl />
+
+          <Source id="countour" {...countourData}>
+            <Layer {...contourLayer} />
+          </Source>
+          
           {
             (markerCoordinates && markerCoordinates.longitude && markerCoordinates.latitude) ?
             <Marker longitude={markerCoordinates.longitude} latitude={markerCoordinates.latitude} color="red" /> :
@@ -127,11 +189,10 @@ export default function App() {
             >
               <div>
                 <img className="weather-icon" src={weatherData.iconUrl} alt="weather-icon" />
-                <div className="bold">
+                <div className="bold text-center">
                   {weatherData.description}
                 </div>
                 <hr />
-                {/* TODO: style all items in renderWeather so that label and values are more separated/table like */}
                 <div>
                   {
                     Object.keys(weatherData).map(key => {
@@ -141,14 +202,18 @@ export default function App() {
                     })
                   }                  
                 </div>
-                
               </div>
             </Popup>
           }
         </Map>        
       </section>
 
-      <ControlPanel settings={markerCoordinates ? markerCoordinates : { longitude: initialViewState.longitude, latitude: initialViewState.latitude}} onChange={updateSettings} />
+      <ControlPanel
+        settings={markerCoordinates ? markerCoordinates : { longitude: initialViewState.longitude, latitude: initialViewState.latitude}}
+        onChange={updateSettings}
+        toggleVal={layerToggle}
+        onToggle={updateToggle}
+      />
     </>
   );
 }
