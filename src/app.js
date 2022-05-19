@@ -149,9 +149,12 @@ export default function App() {
           <NavigationControl position="top-left" />
           <ScaleControl />
 
-          <Source id="countour" {...countourData}>
-            <Layer {...contourLayer} />
-          </Source>
+          {
+            layerToggle &&
+            <Source id="countour" {...countourData}>
+              <Layer {...contourLayer} />
+            </Source>
+          }
           
           {
             (markerCoordinates && markerCoordinates.longitude && markerCoordinates.latitude) ?
