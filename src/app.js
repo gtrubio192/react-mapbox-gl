@@ -55,28 +55,7 @@ export default function App() {
 
   useEffect(() => {
     if (layerToggle) {
-      mapRef.addSource('mapbox-terrain', {
-        type: 'vector',
-        // Use any Mapbox-hosted tileset using its tileset id.
-        // Learn more about where to find a tileset id:
-        // https://docs.mapbox.com/help/glossary/tileset-id/
-        url: 'mapbox://mapbox.mapbox-terrain-v2'
-      });
-
-      mapRef.addLayer({
-        'id': 'terrain-data',
-        'type': 'line',
-        'source': 'mapbox-terrain',
-        'source-layer': 'contour',
-        'layout': {
-        'line-join': 'round',
-        'line-cap': 'round'
-        },
-        'paint': {
-        'line-color': '#ff69b4',
-        'line-width': 1
-        }
-      });
+      // do something
     }
   }, [layerToggle])
 
@@ -142,7 +121,8 @@ export default function App() {
     'paint': {
       'line-color': '#ff69b4',
       'line-width': 1
-    }
+    },
+    filter: ['>=',["number", ["get", "ele"]], 3048]
   };
 
   const countourData = {
