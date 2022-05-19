@@ -1,6 +1,8 @@
 body {
   margin: 0;
   font-family: Helvetica, Arial, sans-serif;
+  color: #6b6b76;
+  text-transform: uppercase;
 }
 .map {
   width: 100vw;
@@ -18,9 +20,35 @@ body {
   margin: 20px;
   font-size: 13px;
   line-height: 2;
-  color: #6b6b76;
-  text-transform: uppercase;
   outline: none;
+}
+
+.weather-popup {
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  padding: 12px 24px;
+  width: 100%;
+}
+
+.weather-icon {
+  margin-left: 25%;
+  background: rebeccapurple;
+  opacity: .8;
+  border-radius: 50%;
+}
+
+.mapboxgl-popup-content {
+  padding: 0;
+  box-shadow: none;
+}
+
+.weather-popup-data {
+  display: flex;
+  justify-content: space-between;
+}
+
+.bold {
+  font-weight: bold;
 }
 
 label {
