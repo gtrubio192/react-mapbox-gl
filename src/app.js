@@ -39,38 +39,47 @@ export default function App() {
     zoom: initialViewState.zoom
   });
 
-  const [markerCoordinates, setMarkerCoordinates] = useState();
-  // {
-  //   latitude: initialViewState.latitude,
-  //   longitude: initialViewState.longitude
-  //  }
+  const [markerCoordinates, setMarkerCoordinates] = useState({
+    latitude: initialViewState.latitude,
+    longitude: initialViewState.longitude
+  });
+  const [isMapClicked, setIsMapClicked] = useState(false);
   const [weatherData, setWeatherData] = useState();
   const [layerToggle, setLayerToggle] = useState(false);
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false)
 
   useEffect(() => {
-    if (markerCoordinates) {
+    // 2 conditions
+    // 1) Initial load - only want to get weather if use clicks on map
+    // 2) Form submit - only get weather if form submit button clicked
+    setWeatherData(null)
+    if (markerCoordinates && isMapClicked) {
       getWeather();
     }
   }, [markerCoordinates])
 
   useEffect(() => {
-    if (layerToggle) {
-      // do something
+    if (isFormSubmitted) {
+      setViewState(v => ({
+        ...v,
+        longitude: markerCoordinates.longitude,
+        latitude: markerCoordinates.latitude
+      }));
+      // setWeatherData(null)
+      getWeather();
     }
-  }, [layerToggle])
+  }, [isFormSubmitted])
 
-  const updateSettings = useCallback(
-    (name, value) =>
-    setMarkerCoordinates(s => ({
+  const updateSettings = useCallback((name, value) => {
+      setMarkerCoordinates(s => ({
         ...s,
         [name]: value
-      })),
-    []
-  );
+      }));
+    }, [])
 
   const updateToggle = useCallback((val) => {
     setLayerToggle(val)
-  })
+  }, [])
 
   const getWeather = async () => {
     const WEATHER_API_KEY = '8eb6eece1d732e462a3657e77a8623ef';
@@ -79,7 +88,6 @@ export default function App() {
     try {
       let { data } = await axios.get(URL);
       
-      console.log(data)
       const { icon, description } = data.weather[0];
       const { feels_like, humidity, temp, temp_max, temp_min  } = data.main;
       const iconUrl = `http://openweathermap.org/img/wn/${icon}@2x.png`
@@ -91,8 +99,15 @@ export default function App() {
         temp,
         tempMax: temp_max,
         tempMin: temp_min,
+        name: data.name
       }
       setWeatherData(newWeather);
+      if (isFormSubmitted) {
+        setIsFormSubmitted(false);
+      }
+      if (isMapClicked) {
+        setIsMapClicked(false);
+      }
     }
 
     catch (e) {
@@ -128,7 +143,59 @@ export default function App() {
   const countourData = {
     type: 'vector',
     url: 'mapbox://mapbox.mapbox-terrain-v2'
-  }
+  };
+
+  const WeatherDisplay1 = () => (
+    <>
+      <img className="weather-icon" src={weatherData.iconUrl} alt="weather-icon" />
+      <div className="bold text-center">
+        {weatherData.description}
+      </div>
+      <hr />
+      <div>
+        {
+          Object.keys(weatherData).map(key => {
+            if (key !== 'description' && key !== 'iconUrl') {
+              return renderWeather(key, weatherData[key])
+            }
+          })
+        }                  
+      </div>
+    </>
+  )
+
+  // name
+  // Icon
+  // Temp
+  // low | high
+  // description
+  // feels like
+  // More details link
+  const WeatherDisplay2 = () => (
+    <>
+      {
+        weather.name !== '' ?
+        <div>{weather.name}</div> :
+        null
+      }
+
+      <img className="weather-icon" src={weatherData.iconUrl} alt="weather-icon" />
+      
+      <div className="bold text-center">
+        {weatherData.description}
+      </div>
+      <hr />
+      <div>
+        {
+          Object.keys(weatherData).map(key => {
+            if (key !== 'description' && key !== 'iconUrl') {
+              return renderWeather(key, weatherData[key])
+            }
+          })
+        }                  
+      </div>
+    </>
+  )
 
   return (
     <>
@@ -141,6 +208,7 @@ export default function App() {
           mapStyle="mapbox://styles/mapbox/streets-v9"
           mapboxAccessToken={MAPBOX_TOKEN}
           onClick={(evt) => {
+            setIsMapClicked(true)
             setMarkerCoordinates({ latitude: evt.lngLat.lat, longitude: evt.lngLat.lng })
           }}
         >
@@ -148,14 +216,12 @@ export default function App() {
           <FullscreenControl position="top-left" />
           <NavigationControl position="top-left" />
           <ScaleControl />
-
           {
             layerToggle &&
             <Source id="countour" {...countourData}>
               <Layer {...contourLayer} />
             </Source>
           }
-          
           {
             (markerCoordinates && markerCoordinates.longitude && markerCoordinates.latitude) ?
             <Marker longitude={markerCoordinates.longitude} latitude={markerCoordinates.latitude} color="red" /> :
@@ -170,32 +236,18 @@ export default function App() {
               onClose={() => setWeatherData(null)}
               className="weather-popup"
             >
-              <div>
-                <img className="weather-icon" src={weatherData.iconUrl} alt="weather-icon" />
-                <div className="bold text-center">
-                  {weatherData.description}
-                </div>
-                <hr />
-                <div>
-                  {
-                    Object.keys(weatherData).map(key => {
-                      if (key !== 'description' && key !== 'iconUrl') {
-                        return renderWeather(key, weatherData[key])
-                      }
-                    })
-                  }                  
-                </div>
-              </div>
+              <WeatherDisplay1 />
             </Popup>
           }
         </Map>        
       </section>
 
       <ControlPanel
-        settings={markerCoordinates ? markerCoordinates : { longitude: initialViewState.longitude, latitude: initialViewState.latitude}}
+        coordinates={markerCoordinates ? markerCoordinates : { longitude: initialViewState.longitude, latitude: initialViewState.latitude}}
         onChange={updateSettings}
         toggleVal={layerToggle}
         onToggle={updateToggle}
+        formCallback={setIsFormSubmitted}
       />
     </>
   );

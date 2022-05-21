@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 
 const camelPattern = /(^|[A-Z])[a-z]*/g;
 function formatSettingName(name) {
@@ -28,25 +28,19 @@ function NumericInput({name, value, onChange}) {
 }
 
 function ControlPanel(props) {
-  const {settings, onChange, toggleVal, onToggle} = props;
-
-  const renderSetting = (name, value) => {
-    switch (typeof value) {
-      case 'boolean':
-        return <Checkbox key={name} name={name} value={value} onChange={onChange} />;
-      case 'number':
-        return <NumericInput key={name} name={name} value={value} onChange={onChange} />;
-      default:
-        return null;
-    }
-  };
+  const { coordinates, onChange, toggleVal, onToggle, formCallback } = props;
 
   return (
     <div className="control-panel">
       <hr />
-      <Checkbox name="layer" value={toggleVal} onChange={onToggle}/>
-      {Object.keys(settings).map(name => renderSetting(name, settings[name]))}
-
+      <Checkbox name="layerToggle" value={toggleVal} onChange={onToggle}/>
+      {
+        Object.keys(coordinates).map(name => 
+          <NumericInput key={name} name={name} value={coordinates[name]} onChange={onChange} />
+        )
+      }
+      {/* TODO: make this button change location of map with weather readings */}
+      <button onClick={() => formCallback(true)}>I want to go to there</button>
       <hr />
     </div>
   );
