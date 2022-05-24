@@ -19,6 +19,7 @@
   "homepage": "https://github.com/gtrubio192/react-mapbox-gl#readme",
   "dependencies": {
     "axios": "^0.27.2",
+    "dotenv": "^16.0.1",
     "mapbox-gl": "^2.8.2",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
@@ -31,10 +32,19 @@
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.0",
     "css-loader": "^6.5.0",
+    "dotenv-webpack": "^7.1.0",
     "html-webpack-plugin": "^5.5.0",
+    "node-sass": "^7.0.1",
+    "postcss-loader": "^7.0.0",
+    "resolve-url-loader": "^5.0.0",
+    "sass-loader": "^13.0.0",
     "style-loader": "^3.3.0",
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.0",
     "webpack-dev-server": "^4.7.0"
-  }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ]
 }

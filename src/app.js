@@ -1,22 +1,18 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import {render} from 'react-dom';
-import axios from 'axios'
+import axios from 'axios';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import React, { useCallback, useEffect, useState } from 'react';
 import Map, {
-  Marker,
-  NavigationControl,
   FullscreenControl,
-  ScaleControl,
-  GeolocateControl,
-  Popup,
-  Layer,
+  Layer, Marker,
+  NavigationControl,
+  Popup, ScaleControl,
   Source
 } from 'react-map-gl';
-import ControlPanel from './control-panel';
+import MapConfig from './Components/mapConfig';
 
-import 'mapbox-gl/dist/mapbox-gl.css';
-import './styles/styles.css'
+const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 
-const MAPBOX_TOKEN = 'pk.eyJ1IjoiZ3RydWJpbzE5MiIsImEiOiJjbDNjMzk3dHEwNWhyM2NzOHljMHR1cGswIn0.KQJ9ZsJTHI567vHyrmOStg';
 
 const initialViewState = {
   latitude: 38.8409,
@@ -24,14 +20,7 @@ const initialViewState = {
   zoom: 10
 };
 
-const camelPattern = /(^|[A-Z])[a-z]*/g;
-function formatSettingName(name) {
-  return name.match(camelPattern).join(' ');
-}
-
-export default function App() {
-
-  const mapRef = useRef();
+const App = () => {
 
   const [viewState, setViewState] = useState({
     latitude: initialViewState.latitude,
@@ -43,16 +32,14 @@ export default function App() {
     latitude: initialViewState.latitude,
     longitude: initialViewState.longitude
   });
+
   const [isMapClicked, setIsMapClicked] = useState(false);
   const [weatherData, setWeatherData] = useState();
   const [layerToggle, setLayerToggle] = useState(false);
-  const [isFormSubmitted, setIsFormSubmitted] = useState(false)
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
   useEffect(() => {
-    // 2 conditions
-    // 1) Initial load - only want to get weather if use clicks on map
-    // 2) Form submit - only get weather if form submit button clicked
-    setWeatherData(null)
+    setWeatherData(null);
     if (markerCoordinates && isMapClicked) {
       getWeather();
     }
@@ -65,7 +52,6 @@ export default function App() {
         longitude: markerCoordinates.longitude,
         latitude: markerCoordinates.latitude
       }));
-      // setWeatherData(null)
       getWeather();
     }
   }, [isFormSubmitted])
@@ -81,8 +67,12 @@ export default function App() {
     setLayerToggle(val)
   }, [])
 
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    setIsFormSubmitted(true)
+  }
+
   const getWeather = async () => {
-    const WEATHER_API_KEY = '8eb6eece1d732e462a3657e77a8623ef';
     const URL = `https://api.openweathermap.org/data/2.5/weather?lat=${markerCoordinates.latitude}&lon=${markerCoordinates.longitude}&appid=${WEATHER_API_KEY}&units=imperial`;
 
     try {
@@ -94,11 +84,11 @@ export default function App() {
       const newWeather = {
         iconUrl,
         description,
-        feelsLike: feels_like,
+        feels_like: Math.round(feels_like),
         humidity,
-        temp,
-        tempMax: temp_max,
-        tempMin: temp_min,
+        temp: Math.round(temp),
+        temp_max: Math.round(temp_max),
+        temp_min: Math.round(temp_min),
         name: data.name
       }
       setWeatherData(newWeather);
@@ -111,17 +101,9 @@ export default function App() {
     }
 
     catch (e) {
+      // TODO: Build nice popup to display errors
       console.log('weather error: ', e)
     }
-  }
-
-  const renderWeather = (name, value) => {
-    return (
-      <div key={name} className="weather-popup-data">
-        <span className="bold">{formatSettingName(name)}: </span>
-        {value}º F
-      </div>
-    );
   }
 
   const contourLayer = {
@@ -145,56 +127,32 @@ export default function App() {
     url: 'mapbox://mapbox.mapbox-terrain-v2'
   };
 
-  const WeatherDisplay1 = () => (
-    <>
-      <img className="weather-icon" src={weatherData.iconUrl} alt="weather-icon" />
-      <div className="bold text-center">
-        {weatherData.description}
-      </div>
-      <hr />
-      <div>
-        {
-          Object.keys(weatherData).map(key => {
-            if (key !== 'description' && key !== 'iconUrl') {
-              return renderWeather(key, weatherData[key])
-            }
-          })
-        }                  
-      </div>
-    </>
-  )
-
-  // name
-  // Icon
-  // Temp
-  // low | high
-  // description
-  // feels like
-  // More details link
-  const WeatherDisplay2 = () => (
-    <>
+  const WeatherDisplay = () => (
+    <div className="weather-popup-data flex">
       {
-        weather.name !== '' ?
-        <div>{weather.name}</div> :
-        null
+        weatherData.name !== '' &&
+        <p className="weather-popup-data--location text-center">{weatherData.name}</p>
       }
-
       <img className="weather-icon" src={weatherData.iconUrl} alt="weather-icon" />
-      
-      <div className="bold text-center">
+      <div className="weather-popup-data--temp">
+        {weatherData.temp}º
+      </div>
+      <div className="weather-popup-data--low-high">
+        <span className="bold">{weatherData.temp_max}º</span> | {weatherData.temp_min}º
+      </div>
+      <div className="bold">
         {weatherData.description}
       </div>
       <hr />
       <div>
-        {
-          Object.keys(weatherData).map(key => {
-            if (key !== 'description' && key !== 'iconUrl') {
-              return renderWeather(key, weatherData[key])
-            }
-          })
-        }                  
+        <span className="bold">Feels like: </span>
+        {weatherData.feels_like}º
       </div>
-    </>
+      <div>
+        <span className="bold">Humidity: </span>
+        {weatherData.humidity}     
+      </div>
+    </div>
   )
 
   return (
@@ -202,9 +160,7 @@ export default function App() {
       <section className="map">
         <Map
           {...viewState}
-          ref={mapRef}
           onMove={evt => setViewState(evt.viewState)}
-          // mapStyle="mapbox://styles/gtrubio192/cl3d91f4k000615n3yvaary94"
           mapStyle="mapbox://styles/mapbox/streets-v9"
           mapboxAccessToken={MAPBOX_TOKEN}
           onClick={(evt) => {
@@ -212,10 +168,10 @@ export default function App() {
             setMarkerCoordinates({ latitude: evt.lngLat.lat, longitude: evt.lngLat.lng })
           }}
         >
-          <GeolocateControl position="top-left" />
           <FullscreenControl position="top-left" />
           <NavigationControl position="top-left" />
           <ScaleControl />
+          <Marker longitude={markerCoordinates.longitude} latitude={markerCoordinates.latitude} color="red" />
           {
             layerToggle &&
             <Source id="countour" {...countourData}>
@@ -223,34 +179,30 @@ export default function App() {
             </Source>
           }
           {
-            (markerCoordinates && markerCoordinates.longitude && markerCoordinates.latitude) ?
-            <Marker longitude={markerCoordinates.longitude} latitude={markerCoordinates.latitude} color="red" /> :
-            null
-          }
-          {
             weatherData &&
             <Popup
               longitude={markerCoordinates.longitude}
               latitude={markerCoordinates.latitude}
+              // TODO: Detect where on screen user clicks, and dynamically position so that popup is always visible
               anchor="top"
               onClose={() => setWeatherData(null)}
-              className="weather-popup"
+              className="weather-popup map-overlay-container"
             >
-              <WeatherDisplay1 />
+              <WeatherDisplay />
             </Popup>
           }
-        </Map>        
+        </Map>
       </section>
 
-      <ControlPanel
+      <MapConfig
         coordinates={markerCoordinates ? markerCoordinates : { longitude: initialViewState.longitude, latitude: initialViewState.latitude}}
         onChange={updateSettings}
         toggleVal={layerToggle}
         onToggle={updateToggle}
-        formCallback={setIsFormSubmitted}
+        formCallback={handleFormSubmit}
       />
     </>
   );
 }
 
-render(<App />, document.body.appendChild(document.createElement('div')));
+export default App;

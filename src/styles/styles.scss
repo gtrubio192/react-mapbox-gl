@@ -1,0 +1,207 @@
+body {
+  margin: 0;
+  font-family: Helvetica, Arial, sans-serif;
+  color: #6b6b76;
+  text-transform: uppercase;
+}
+
+.map {
+  width: 100vw;
+  height: 100vh;
+}
+
+.map-config {
+  position: absolute;
+  top: 0;
+  right: 0;
+  max-width: 280px;
+  margin: 20px;
+  font-size: 12px;
+  line-height: 2;
+  outline: none;
+
+  &-row.flex {
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  &-submit {
+    padding: 6px 20px;
+    margin: 6px 0;
+    color: white;
+    background:  #007bff;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    &:hover {
+      background-color: #0069d9;
+    }
+  }
+
+  &-row {
+    margin-bottom: 12px;
+  }
+
+}
+
+.map-overlay-container {
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  padding: 12px 24px;
+}
+
+.weather-popup {
+  border: 2px solid lightseagreen;
+
+  &-data.flex {
+    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &-data {
+    &--location {
+      font-size: 18px;
+    }
+  
+    &--low-high {
+      font-size: 12px;
+      margin-bottom: 18px;
+    }
+  
+    &--temp {
+      font-size: 42px;
+      line-height: 1.2;
+    }
+  
+    &--temp::after {
+      content: 'F';
+      font-size: 12px;
+    }
+  }
+
+}
+
+.weather-icon {
+  background: lightskyblue;
+  opacity: .6;
+  border-radius: 50%;
+  width: 30%;
+}
+
+.mapboxgl-popup-content {
+  padding: 0;
+  box-shadow: none;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.flex {
+  display: flex;
+}
+
+label {
+  width: 160px;
+}
+
+input {
+  max-width: 100px;
+  padding: 2px 8px;
+}
+
+.mapboxgl-popup-close-button {
+  right: -13px;
+  top: -13px;
+  font-size: 18px;
+}
+
+.switch-container {
+  width: 6em;
+  height: 2.5em;
+  border-radius: 10em;
+  box-shadow: 2px 2px 7px 2px #cfd8dc;
+  position: relative;
+  display: inline-block;
+
+  .switch-color {
+    width: 5.5em;
+    height: 2em;
+    left: 4px;
+    top: 3px;
+    background: #cfd8dc;
+    border-radius: 10em;
+    z-index: -1;
+    position: absolute;
+    transition: all 500ms cubic-bezier(0.34, 1.36, 0.2, 1);
+
+    &::before {
+      font-weight: 900;
+      font-size: 1em;
+      content: "OFF";
+      position: absolute;
+      right: 10px;
+      color: white;
+    }
+
+    &::after {
+      font-weight: 900;
+      font-size: 1em;
+      content: "ON";
+      position: absolute;
+      left: 10px;
+      opacity: 0;
+      color: black;
+    }
+  }
+}
+
+label[for='switch'] {
+  width: 2em;
+  height: 2em;
+  border-radius: 10em;
+  border: 2px solid #cfd8dc;
+  background: white;
+  position: absolute;
+  top: 0.1em;
+  left: .25em;
+  z-index: 1;
+  cursor: pointer;
+}
+
+#switch {
+  display: none;
+  // Hide "OFF" on checked
+  &:checked ~ .switch-color::before {
+    opacity: 0;
+  }
+  // Show "ON" on checked
+  &:checked ~ .switch-color::after {
+    opacity: 1;
+  }
+  // Move toggle on checked
+  &:checked ~ label[for='switch'] {
+    transform: translatex(3.25em) rotatez(360deg);
+  }
+  // Show green background on check
+  &:checked ~ .switch-color {
+    background: #00e676;
+    z-index: 0;
+  }
+  // Show red background when not checked
+  &:not(:checked) ~ .switch-color {
+    background: rgb(242, 75, 75);
+    z-index: 0;
+  }
+  
+  & ~ label[for='switch'] {
+    transition: all 1s cubic-bezier(0.34, 1.36, 0.2, 1);
+  }
+}
