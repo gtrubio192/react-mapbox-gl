@@ -5,6 +5,7 @@ Interactive slippy map built with React + Mapbox GL +
 
 1) Run commands in terminal:
 > npm install
+
 > npm run start
 
 2) Navigate to localhost:8080
