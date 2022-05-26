@@ -10,7 +10,7 @@ import Map, {
 } from 'react-map-gl';
 import MapConfig from './Components/mapConfig';
 
-const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
+const MAPBOX_KEY = process.env.MAPBOX_KEY;
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 
 
@@ -162,7 +162,7 @@ const App = () => {
           {...viewState}
           onMove={evt => setViewState(evt.viewState)}
           mapStyle="mapbox://styles/mapbox/streets-v9"
-          mapboxAccessToken={MAPBOX_TOKEN}
+          mapboxAccessToken={MAPBOX_KEY}
           onClick={(evt) => {
             setIsMapClicked(true)
             setMarkerCoordinates({ latitude: evt.lngLat.lat, longitude: evt.lngLat.lng })
