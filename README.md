@@ -1,6 +1,9 @@
 # react-mapbox-gl
 Interactive slippy map built with React + Mapbox GL + react-map-gl
 
+![map preview](https://raw.githubusercontent.com/gtrubio192/react-mapbox-gl/main/src/assets/preview-shot.png)
+
+
 ## How to install & run
 
 Prerequisites:
