@@ -8,6 +8,7 @@ You must have valid API keys for both Mapbox GL and OpenWeather.
 Once you have both API keys, create a file with the name `.env` and create two variables as so:
 
 // .env
+
 MAPBOX_KEY=<YOUR_MAPBOX_KEY>
 WEATHER_API_KEY=<YOUR_WEATHER_KEY>
 
