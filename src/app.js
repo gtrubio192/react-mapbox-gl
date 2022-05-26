@@ -17,7 +17,7 @@ const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 const initialViewState = {
   latitude: 38.8409,
   longitude: -105.0423,
-  zoom: 14.104
+  zoom: 11
 };
 
 const App = () => {

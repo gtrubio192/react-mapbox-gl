@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   mode: 'development',
@@ -19,7 +20,7 @@ module.exports = {
           {
             test: /\.module\.s?css$/,
             use: [
-              'style-loader',
+              MiniCssExtractPlugin.loader,
               {
                 loader: 'css-loader',
                 options: { modules: true, exportOnlyLocals: false }
@@ -28,7 +29,7 @@ module.exports = {
             ]
           },
           {
-            use: ['style-loader', 'css-loader', 'sass-loader']
+            use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
           }
         ]
       },
@@ -53,10 +54,9 @@ module.exports = {
     ]
   },
 
-  // Optional: Enables reading mapbox token from environment variable
   plugins: [
     new HtmlWebpackPlugin({title: 'NREL Interactive Map'}),
-    new webpack.EnvironmentPlugin({MapboxAccessToken: ''}),
-    new Dotenv()
+    new Dotenv(),
+    new MiniCssExtractPlugin()
   ]
 };
