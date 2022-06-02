@@ -7,6 +7,7 @@ const NumericInput = ({name, value, onChange}) => {
       <input
         type="number"
         value={value}
+        step={.0001}
         onChange={e => onChange(name, Number(e.target.value))}
       />
     </div>

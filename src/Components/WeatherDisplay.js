@@ -1,5 +1,8 @@
 import React from 'react';
-
+/**
+ * 
+ * @todo: Wrap component in memo
+ */
 const WeatherDisplay = ({weatherData}) => (
   <div className="weather-popup-data flex">
     {

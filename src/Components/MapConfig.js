@@ -16,8 +16,16 @@ const MapConfig = (props) => {
       <hr />
       <Toggle name="terrain countour" value={toggleVal} onChange={onToggle}/>
       <form onSubmit={(e) => formCallback(e)}>
-        <NumericInput name="latitude" value={coordinates['latitude']} onChange={onChange} />
-        <NumericInput name="longitude" value={coordinates['longitude']} onChange={onChange} />
+        <NumericInput
+          name="latitude"
+          value={coordinates['latitude']}
+          onChange={onChange}
+        />
+        <NumericInput
+          name="longitude"
+          value={coordinates['longitude']}
+          onChange={onChange}
+        />
         <hr />
         <button type="submit" className="map-config-submit bold">Lets Go!</button>
       </form>

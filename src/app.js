@@ -20,6 +20,9 @@ const initialViewState = {
   zoom: 11
 };
 
+const LAT_RANGE = 90;
+const LONG_RANGE = 180;
+
 const App = () => {
 
   const [viewState, setViewState] = useState({
@@ -38,9 +41,15 @@ const App = () => {
   const [layerToggle, setLayerToggle] = useState(false);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
+  /**
+   * @todo: 
+   * 1) Adjust outlier marker coordinates when map is fully zoomed out and multiple worlds displaying
+   *    Ref: https://docs.mapbox.com/mapbox-gl-js/example/popup-on-click/
+   * 2) Adjust position of marker when latitudes are too close to north/south edge of map
+   */
   useEffect(() => {
     setWeatherData(null);
-    if (markerCoordinates && isMapClicked) {
+    if (isMapClicked) {
       getWeather();
     }
   }, [markerCoordinates])
@@ -57,7 +66,11 @@ const App = () => {
   }, [isFormSubmitted])
 
   const updateSettings = useCallback((name, value) => {
-      setMarkerCoordinates(s => ({
+    const range = name === 'latitude' ? LAT_RANGE : LONG_RANGE;
+
+    value = Math.max(-range, Math.min(range, Number(value)));
+
+    setMarkerCoordinates(s => ({
         ...s,
         [name]: value
       }));
@@ -101,7 +114,9 @@ const App = () => {
     }
 
     catch (e) {
-      // TODO: Build nice popup to display errors
+      /**
+       * @todo: Build nice popup to display weather errors (see todo about adjusting marker coordinates)
+       */
       console.log('weather error: ', e)
     }
   }
@@ -151,11 +166,15 @@ const App = () => {
             </Source>
           }
           {
+            /**
+             * @todo: 
+             * 1) Detect where on screen user clicks, and dynamically set anchor prop so that popup is always visible
+             * 2) Provide skeleton/loader while weather data is loading
+             */
             weatherData &&
             <Popup
               longitude={markerCoordinates.longitude}
               latitude={markerCoordinates.latitude}
-              // TODO: Detect where on screen user clicks, and dynamically position so that popup is always visible
               anchor="top"
               onClose={() => setWeatherData(null)}
               className="weather-popup map-overlay-container"
@@ -177,4 +196,7 @@ const App = () => {
   );
 }
 
+/**
+ * @todo: Add prop validation to all child components
+ */
 export default App;
