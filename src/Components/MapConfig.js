@@ -34,3 +34,4 @@ const MapConfig = (props) => {
 }
 
 export default React.memo(MapConfig);
+
